@@ -1,0 +1,9 @@
+form div,
+fieldset {
+  margin-bottom: 0.5rem;
+}
+
+fieldset {
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+}
