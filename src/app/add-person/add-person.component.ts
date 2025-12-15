@@ -21,18 +21,25 @@ export class AddPersonComponent {
     address: {
       city: '',
       street: '',
-      postCode: ''
+      postCode: '',
     }
   };
 
   constructor(
     private personService: PersonService,
     private router: Router
-  ) { }
+  ) {}
 
   save(): void {
-    this.personService.add(this.person);
-    this.router.navigate(['/']);
+    this.personService.add(this.person).subscribe({
+      next: () => {
+        this.router.navigate(['/']);
+      },
+      error: (error) => {
+        console.error('Błąd podczas zapisywania osoby', error);
+        alert('Nie udało się zapisać osoby.');
+      }
+    });
   }
 
   cancel(): void {

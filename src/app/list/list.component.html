@@ -3,16 +3,12 @@
 <button (click)="goToAdd()">Dodaj osobę</button>
 
 <ul>
-  @for (person of persons; track $index) {
+  @for (person of persons; track person.id) {
     <li>
       <strong>{{ person.firstName }} {{ person.familyName }}</strong>
       <span *ngIf="person.age"> (wiek: {{ person.age }})</span>
-      <button (click)="goToDetails($index)">Szczegóły</button>
-      <button (click)="delete($index)">Usuń</button>
+      <button (click)="goToDetails(person)">Szczegóły</button>
+      <button (click)="delete(person)">Usuń</button>
     </li>
   }
 </ul>
-
-<p *ngIf="persons.length === 0">
-  Brak zapisanych osób.
-</p>

@@ -1,52 +1,34 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { Person } from '../models/person';
 
-const STORAGE_KEY = 'persons';
-
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PersonService {
+  // adres backendu Spring Boot
+  private apiUrl = 'http://localhost:8080/api/persons';
 
-  constructor() { }
+  constructor(private http: HttpClient) {}
 
-  private loadFromStorage(): Person[] {
-    const json = localStorage.getItem(STORAGE_KEY);
-    if (!json) {
-      return [];
-    }
-    try {
-      return JSON.parse(json) as Person[];
-    } catch (e) {
-      console.error('Błąd parsowania danych z localStorage', e);
-      return [];
-    }
+  getAll(): Observable<Person[]> {
+    return this.http.get<Person[]>(this.apiUrl);
   }
 
-  private saveToStorage(persons: Person[]): void {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(persons));
+  get(id: number): Observable<Person> {
+    return this.http.get<Person>(`${this.apiUrl}/${id}`);
   }
 
-  getAll(): Person[] {
-    return this.loadFromStorage();
+  add(person: Person): Observable<Person> {
+    return this.http.post<Person>(this.apiUrl, person);
   }
 
-  getByIndex(index: number): Person | undefined {
-    const persons = this.loadFromStorage();
-    return persons[index];
+  update(id: number, person: Person): Observable<Person> {
+    return this.http.put<Person>(`${this.apiUrl}/${id}`, person);
   }
 
-  add(person: Person): void {
-    const persons = this.loadFromStorage();
-    persons.push(person);
-    this.saveToStorage(persons);
-  }
-
-  delete(index: number): void {
-    const persons = this.loadFromStorage();
-    if (index >= 0 && index < persons.length) {
-      persons.splice(index, 1);
-      this.saveToStorage(persons);
-    }
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 }

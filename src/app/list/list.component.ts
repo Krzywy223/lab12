@@ -18,22 +18,53 @@ export class ListComponent implements OnInit {
   constructor(
     private personService: PersonService,
     private router: Router
-  ) { }
+  ) {}
 
   ngOnInit(): void {
-    this.persons = this.personService.getAll();
+    this.loadPersons();
+  }
+
+  loadPersons(): void {
+    this.personService.getAll().subscribe({
+      next: (persons) => {
+        this.persons = persons;
+      },
+      error: (error) => {
+        console.error('Błąd podczas pobierania listy osób', error);
+        alert('Nie udało się pobrać listy osób z serwera.');
+      }
+    });
   }
 
   goToAdd(): void {
     this.router.navigate(['/add']);
   }
 
-  goToDetails(index: number): void {
-    this.router.navigate(['/details', index]);
+  goToDetails(person: Person): void {
+    console.log('goToDetails person=', person); // debug na chwilę
+    if (person.id != null) {
+      this.router.navigate(['/details', person.id]);
+    }
   }
 
-  delete(index: number): void {
-    this.personService.delete(index);
-    this.persons = this.personService.getAll();
+  delete(person: Person): void {
+    if (person.id == null) {
+      return;
+    }
+
+    if (!confirm('Na pewno chcesz usunąć tę osobę?')) {
+      return;
+    }
+
+    this.personService.delete(person.id).subscribe({
+      next: () => {
+        // po udanym usunięciu odśwież listę
+        this.loadPersons();
+      },
+      error: (error) => {
+        console.error('Błąd podczas usuwania osoby', error);
+        alert('Nie udało się usunąć osoby.');
+      }
+    });
   }
 }
